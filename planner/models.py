@@ -16,5 +16,10 @@ class Place(models.Model):
     notes = models.TextField(blank=True, null=True)
     is_visited = models.BooleanField(default=False)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['project', 'external_id'], name='unique_project_place')
+        ]
+
     def __str__(self):
         return f"Place {self.external_id} in {self.project.name}"
