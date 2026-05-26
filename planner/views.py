@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Project
 from .serializers import ProjectSerializer, PlaceSerializer
+from .services import validate_artwork_id
 
 
 @api_view(['GET', 'POST'])
@@ -87,7 +88,9 @@ def project_places_list_create(request, project_id):
         # Prevent adding the same external place to the same project more than once
         if project.places.filter(external_id=external_id).exists():
             return Response({"detail": "This place has already been added to this project."}, status=status.HTTP_400_BAD_REQUEST)
-
+        # Validate that a place exists in the Art Institute API before storing it
+        if not validate_artwork_id(external_id):
+            return Response({"detail": "Invalid external place ID. Not found in Art Institute API."}, status=status.HTTP_400_BAD_REQUEST)
         serializer = PlaceSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(project=project)
