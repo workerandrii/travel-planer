@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Project
+from .models import Project, Place
 from .serializers import ProjectSerializer, PlaceSerializer
 from .services import validate_artwork_id
 
@@ -100,4 +100,37 @@ def project_places_list_create(request, project_id):
             project.save()
             
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(['GET', 'PATCH'])
+def project_place_detail(request, project_id, place_id):
+    """
+    GET: Get a single place within a project.
+    PATCH: Update notes and/or mark a place as visited.
+    """
+    try:
+        place = Place.objects.get(id=place_id, project_id=project_id)
+    except Place.DoesNotExist:
+        return Response({"detail": "Place not found in this project."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = PlaceSerializer(place)
+        return Response(serializer.data)
+
+    elif request.method == 'PATCH':
+        serializer = PlaceSerializer(place, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+
+            # When all places in a project are marked as visited, the project is marked as completed.
+            project = place.project
+            all_places = project.places.all()
+            if all_places.exists() and all(p.is_visited for p in all_places):
+                project.is_completed = True
+            else:
+                project.is_completed = False
+            project.save()
+
+            return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
