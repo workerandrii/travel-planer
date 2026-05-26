@@ -1,0 +1,99 @@
+{
+	"info": {
+		"name": "Travel Planner Assessment (Public)",
+		"_postman_id": "12345-abcde-67890",
+		"description": "Public collection to test all endpoints for the Travel Planner assessment.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Projects",
+			"item": [
+				{
+					"name": "List Projects (with Pagination & Filter)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/projects/?is_completed=false",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "projects", ""],
+							"query": [
+								{
+									"key": "is_completed",
+									"value": "false"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Project (Bulk Imports)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Trip to Chicago Art Galleries\",\n    \"description\": \"Exploring classical collections\",\n    \"start_date\": \"2026-06-15\",\n    \"places\": [\n        {\n            \"external_id\": 27992,\n            \"notes\": \"Vincent van Gogh Room\"\n        },\n        {\n            \"external_id\": 16568,\n            \"notes\": \"Impressionism Exhibit\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/projects/",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "projects", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Places (Nested)",
+			"item": [
+				{
+					"name": "Add Single Place to Project",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"external_id\": 21125,\n    \"notes\": \"Check out the sculpture court\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/projects/1/places/",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "projects", "1", "places", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Place (Mark Visited / Update Notes)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"is_visited\": true,\n    \"notes\": \"Amazing exhibit, spent 2 hours here!\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/projects/1/places/1/",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["api", "projects", "1", "places", "1", ""]
+						}
+					}
+				}
+			]
+		}
+	]
+}
